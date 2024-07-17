@@ -3,14 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E-commerce store</title>
+    <title>SwiftCart — The fastest e-commerce store in SA</title>
     <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v1.9.8/dist/alpine.js" defer></script>
     <link rel="stylesheet" href="https://unpkg.com/tailwindcss@1.2.0/dist/tailwind.min.css">
 </head>
-<body>
-    <header className="sticky z-50 top-0">
-        <span className="self-center text-2xl font-semibold whitespace-nowrap text-white">
-            SwiftCart
-          </span>
+<body class="bg-blue-200"> <!--Sets background color-->
+        <header class="sticky z-50 top-0">
+            <nav class="bg-gray-500 border-gray-200 ">
+                <img src="./assets/online-shop.png" class="h-8" alt="Flowbite Logo" />
+                    <span class="self-center text-2xl font-semibold whitespace-nowrap text-white">
+                        SwiftCart
+                    </span>
+                    
+                    <ul class="flex flex-col top-10 font-medium p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-500 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0">
+                       <li>
+                            Wishlist
+                       </li>
+                       <li>
+                            Cart
+                       </li>
+                       <li>
+                            Login
+                       </li>
+                    </ul>
+                    
+            </nav>
+        </header>
 </body>
 </html>
