@@ -18,7 +18,6 @@
     />
   </head>
   <body class="bg-blue-200">
-    <!-- Sets background color -->
     <header class="sticky z-50 top-0">
       <nav class="bg-gray-500 border-gray-200">
         <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
@@ -107,36 +106,37 @@
     <div 
       x-data="{ 
         products: [], 
+        filteredProducts: [],
+        category: '',
         sortOption: 'default',
-        async fetchProducts() {
-          try {
-            const response = await fetch('https://fakestoreapi.com/products');
-            if (!response.ok) {
-              throw new Error('Network response was not ok');
-            }
-            this.products = await response.json();
-            this.sortProducts();
-          } catch(error) {
-            console.error('Error fetching products:', error);
-          }
-        },
+        fetchProducts() {
+            fetch('https://fakestoreapi.com/products') 
+            .then(response => response.json())
+            .then(data => {
+                this.products = data;
+                this.filteredProducts = data;
+            });
+    },
+        
+    sortProducts() {
+        if (this.sortOption === 'lowToHigh') {
+            this.filteredProducts = [...this.filteredProducts].sort((a, b) => a.price - b.price);
+        } else if (this.sortOption === 'highToLow') {
+            this.filteredProducts = [...this.filteredProducts].sort((a, b) => b.price - a.price);
+        } else {
+            this.filteredProducts = this.products;
+        }
+    },
 
-        sortProducts() {
-          console.log('Sorting products, current sort option:', this.sortOption);
-          if (this.sortOption === 'lowToHigh') {
-            this.products = this.products.slice().sort((a, b) => a.price - b.price);
-          } else if (this.sortOption === 'highToLow') {
-            this.products = this.products.slice().sort((a, b) => b.price - a.price);
-          } else {
-            console.log('Default sorting, no changes made.');
-          }
-        },
-      }"
-      x-init="fetchProducts()"
-      class="p-4"
-    >
+    searchByCategory(category) {
+        this.category = category;
+        this.filteredProducts = this.products.filter(product => product.category.toLowerCase().includes(category.toLowerCase()));
+    }
+}"
+  x-init="fetchProducts()"
+>
       <div class="flex justify-end mb-4">
-        <select x-model="sortOption" @change="sortProducts" class="p-2 border rounded">
+        <select x-model="sortOption" @change="sortProducts()" class="p-2 border rounded">
           <option value="default">Default</option>
           <option value="lowToHigh">Price: Low to High</option>
           <option value="highToLow">Price: High to Low</option>
@@ -144,7 +144,7 @@
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
-        <template x-for="product in products" :key="product.id">
+        <template x-for="product in filteredProducts" :key="product.id">
           <div class="border rounded-lg shadow-lg overflow-hidden bg-white">
             <img :src="product.image" alt="Product Image" class="object-contain h-48 mt-3">
             <div class="flex-1 flex flex-col p-6">
