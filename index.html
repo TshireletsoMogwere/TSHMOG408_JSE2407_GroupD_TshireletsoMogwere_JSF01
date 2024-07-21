@@ -107,7 +107,8 @@
       x-data="{ 
         products: [], 
         filteredProducts: [],
-        category: '',
+        categories: [],
+        selectedCategory: '',
         sortOption: 'default',
         fetchProducts() {
             fetch('https://fakestoreapi.com/products') 
@@ -115,8 +116,16 @@
             .then(data => {
                 this.products = data;
                 this.filteredProducts = data;
+                this.categories = [...new Set(data.map(product => product.category))];
             });
     },
+
+    updateFilteredProducts() {
+      let tempProducts = this.products;
+
+      if (this.selectedCategory) {
+        tempProducts = tempProducts.filter(product => product.category === this.selectedCategory);
+    }
         
     sortProducts() {
         if (this.sortOption === 'lowToHigh') {
@@ -132,9 +141,12 @@
         this.category = category;
         this.filteredProducts = this.products.filter(product => product.category.toLowerCase().includes(category.toLowerCase()));
     }
+  }
 }"
   x-init="fetchProducts()"
 >
+
+        <!-- Sorts options -->
       <div class="flex justify-end mb-4">
         <select x-model="sortOption" @change="sortProducts()" class="p-2 border rounded">
           <option value="default">Default</option>
@@ -142,6 +154,17 @@
           <option value="highToLow">Price: High to Low</option>
         </select>
       </div>
+
+      <!-- Filters by category -->
+      <div class="mb-6">
+        <label for="categoryDropdown" class="block text-lg font-medium mb-2">Filter by Category:</label>
+        <select id="categoryDropdown" x-model="selectedCategory" @change="updateFilteredProducts()" class="p-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">All Categories</option>
+            <template x-for="category in categories" :key="category">
+                <option :value="category" x-text="category"></option>
+            </template>
+        </select>
+    </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
         <template x-for="product in filteredProducts" :key="product.id">
