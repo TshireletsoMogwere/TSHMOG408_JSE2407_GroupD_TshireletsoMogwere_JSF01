@@ -115,213 +115,162 @@
       </nav>
     </header>
 
-    <div
-      x-data="{ 
-        products: [], 
-        filteredProducts: [],
-        categories: [],
-        selectedCategory: '',
-        searchTerm: '',
-        sortOption: 'default',
-         selectedProduct: null,
-        fetchProducts() {
-            fetch('https://fakestoreapi.com/products') 
-            .then(response => response.json())
-            .then(data => {
-                this.products = data;
-                this.filteredProducts = data;
-                this.categories = [...new Set(data.map(product => product.category))];
-            });
-    },
+    <div x-data="{
+      products: [],
+      filteredProducts: [],
+      categories: [],
+      selectedCategory: '',
+      searchTerm: '',
+      sortOption: 'default',
+      selectedProduct: null,
+      isLoading: true,
+      isModalLoading: false,
 
-    updateFilteredProducts() {
-      let tempProducts = this.products;
+      fetchProducts() {
+          fetch('https://fakestoreapi.com/products')
+              .then(response => response.json())
+              .then(data => {
+                  this.products = data;
+                  this.filteredProducts = data;
+                  this.categories = [...new Set(data.map(product => product.category))];
+                  this.isLoading = false;
+              });
+      },
 
-      // Filter by category if selected
-      if (this.selectedCategory) {
-        tempProducts = tempProducts.filter(product => product.category === this.selectedCategory);
-    }
-        
-    // Apply sorting
-    if (this.sortOption === 'lowToHigh') {
-      tempProducts.sort((a, b) => a.price - b.price);
-  } else if (this.sortOption === 'highToLow') {
-      tempProducts.sort((a, b) => b.price - a.price);
-  }
+      updateFilteredProducts() {
+          let tempProducts = this.products;
 
+          // Filter by category if selected
+          if (this.selectedCategory) {
+              tempProducts = tempProducts.filter(product => product.category === this.selectedCategory);
+          }
 
-    // Apply search term
-      if (this.searchTerm) {
-      tempProducts = tempProducts.filter(product =>
-          product.title.toLowerCase().includes(this.searchTerm.toLowerCase())
-      );
-  }
+          // Apply sorting
+          if (this.sortOption === 'lowToHigh') {
+              tempProducts.sort((a, b) => a.price - b.price);
+          } else if (this.sortOption === 'highToLow') {
+              tempProducts.sort((a, b) => b.price - a.price);
+          }
 
-  this.filteredProducts = tempProducts;
-},
+          // Apply search term
+          if (this.searchTerm) {
+              tempProducts = tempProducts.filter(product =>
+                  product.title.toLowerCase().includes(this.searchTerm.toLowerCase())
+              );
+          }
 
-    // Opens Modal by product click
-    openModal(productId) {
-      this.isModalLoading = true;
-      fetch(`https://fakestoreapi.com/products/${productId}`)
-          .then(response => response.json())
-          .then(data => {
-              this.selectedProduct = data;
-              this.isModalLoading = false;
-          });
-  },
+          this.filteredProducts = tempProducts;
+      },
 
-  closeModal() {
-    this.selectedProduct = null;
-}
-    }"
-      x-init="fetchProducts()"
-    >
-      <!-- Sorts options -->
-      <div class="mb-6">
-        <label for="sort" class="block text-lg font-medium mb-2">Sort By:</label>
-        <select id="sort" x-model="sortOption" @change="updateFilteredProducts()" class="p-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <option value="default">Default</option>
-            <option value="lowToHigh">Price: Low to High</option>
-            <option value="highToLow">Price: High to Low</option>
-        </select>
-    </div>
+      openModal(productId) {
+          this.isModalLoading = true;
+          fetch(`https://fakestoreapi.com/products/${productId}`)
+              .then(response => response.json())
+              .then(data => {
+                  this.selectedProduct = data;
+                  this.isModalLoading = false;
+              });
+      },
 
-      <!-- Filters by category -->
-      <div class="mb-6">
-        <label for="categoryDropdown" class="block text-lg font-medium mb-2"
-          >Filter by Category:</label
-        >
-        <select
-          id="categoryDropdown"
-          x-model="selectedCategory"
-          @change="updateFilteredProducts()"
-          class="p-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
+      closeModal() {
+          this.selectedProduct = null;
+      }
+  }" 
+  x-init="fetchProducts()"
+>
+  <!-- Sort Options -->
+  <div class="mb-6">
+      <label for="sort" class="block text-lg font-medium mb-2">Sort By:</label>
+      <select id="sort" x-model="sortOption" @change="updateFilteredProducts()" class="p-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <option value="default">Default</option>
+          <option value="lowToHigh">Price: Low to High</option>
+          <option value="highToLow">Price: High to Low</option>
+      </select>
+  </div>
+
+  <!-- Filter by Category Dropdown -->
+  <div class="mb-6">
+      <label for="categoryDropdown" class="block text-lg font-medium mb-2">Filter by Category:</label>
+      <select id="categoryDropdown" x-model="selectedCategory" @change="updateFilteredProducts()" class="p-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
           <option value="">All Categories</option>
           <template x-for="category in categories" :key="category">
-            <option :value="category" x-text="category"></option>
+              <option :value="category" x-text="category"></option>
           </template>
-        </select>
-      </div>
+      </select>
+  </div>
 
-      <!-- Search by Product Name -->
-      <div class="mb-6">
-        <label for="productSearch" class="block text-lg font-medium mb-2"
-          >Search by Product Name:</label
-        >
-        <input
-          type="text"
-          id="productSearch"
-          x-model="searchTerm"
-          @input="updateFilteredProducts()"
-          class="p-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
-        />
-      </div>
+  <!-- Search by Product Name -->
+  <div class="mb-6">
+      <label for="productSearch" class="block text-lg font-medium mb-2">Search by Product Name:</label>
+      <input type="text" id="productSearch" x-model="searchTerm" @input="updateFilteredProducts()" class="p-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-full">
+  </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
-        <template x-for="product in filteredProducts" :key="product.id">
-          <div class="border rounded-lg shadow-lg overflow-hidden bg-white">
-            <img
-              :src="product.image"
-              alt="Product Image"
-              class="object-contain h-48 mt-3"
-            />
-            <div class="flex-1 flex flex-col p-6">
-              <div class="flex-1">
-                <header class="mb-2 flex-2">
-                  <div
-                    class="text-slate-600 focus-visible:outline-none focus-visible:ring focus-visible:ring-indigo-300"
-                  >
-                    <p
-                      class="text-lg line-clamp-2 font-extrabold leading-snug"
-                      x-text="product.title"
-                    ></p>
+  <!-- Product List or Loading Skeleton -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <template x-if="isLoading">
+          <template x-for="n in 6">
+              <div class="bg-white p-4 rounded-lg shadow-md">
+                  <div class="animate-pulse">
+                      <div class="h-40 bg-gray-200 rounded-md mb-4"></div>
+                      <div class="h-6 bg-gray-200 rounded mb-2"></div>
+                      <div class="h-4 bg-gray-200 rounded mb-2"></div>
+                      <div class="h-4 bg-gray-200 rounded"></div>
                   </div>
-                </header>
-
-                <div
-                  class="text-base line-clamp-2 font-extrabold text-slate-500 leading-snug"
-                >
-                  <p x-text="`$${product.price}`"></p>
-                </div>
               </div>
+          </template>
+      </template>
 
-              <div class="flex mt-1 space-x-2">
-                <div class="justify-start flex-1">
-                  <p
-                    class="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10"
-                    x-text="product.category"
-                  ></p>
-                </div>
-
-               
-                  <!-- Modal -->
-            <div x-show="selectedProduct" @click.self="closeModal()" class="modal" :class="{ 'modal-active': selectedProduct }">
-              <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full relative mx-auto my-6">
-                  <button @click="closeModal()" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700">
-                      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                      </svg>
-                  </button>
-
-                  <template x-if="isModalLoading">
-                      <div class="animate-pulse">
-                          <div class="h-32 w-32 bg-gray-200 rounded-md mb-4 mx-auto"></div>
-                          <div class="h-6 bg-gray-200 rounded mb-2"></div>
-                          <div class="h-4 bg-gray-200 rounded mb-2"></div>
-                          <div class="h-4 bg-gray-200 rounded mb-2"></div>
-                          <div class="h-4 bg-gray-200 rounded"></div>
-                      </div>
-                  </template>
-
-                  <template x-if="!isModalLoading && selectedProduct">
-                      <div class="flex items-center mb-4">
-                          <img :src="selectedProduct.image" :alt="selectedProduct.title" class="w-32 h-32 object-cover rounded-lg mr-4">
-                          <div>
-                              <h2 class="text-2xl font-semibold mb-2" x-text="selectedProduct.title"></h2>
-                              <p class="text-gray-700 mb-2" x-text="`Price: $${selectedProduct.price}`"></p>
-                              <p class="text-gray-900 font-medium mb-2" x-text="`Category: ${selectedProduct.category}`"></p>
-                              <p class="text-gray-600 mb-2" x-text="`Rating: ${selectedProduct.rating.rate} (${selectedProduct.rating.count} reviews)`"></p>
-                              <p class="text-gray-600 mt-2" x-text="selectedProduct.description"></p>
-                          </div>
-                      </div>
-                  </template>
-
-
-                <div class="justify-end space-x-2">
-                  <button @click="add-to-favourites">
-                    <svg
-                      class="h-5 w-5 hover:fill-red-500"
-                      aria-hidden="true"
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      transform="scale(1.6)"
-                    >
-                      <path
-                        stroke="currentColor"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M12.01 6.001C6.5 1 1 8 5.782 13.001L12.011 20l6.23-7C23 8 17.5 1 12.01 6.002Z"
-                      />
-                    </svg>
-                  </button>
-
-                  <button
-                    class="inline-flex justify-center whitespace-nowrap rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-cyan-900 focus-visible:outline-none focus-visible:ring focus-visible:ring-indigo-300 transition-colors"
-                  >
-                    Add To Cart
-                  </button>
-                </div>
+      <template x-if="!isLoading">
+          <template x-for="product in filteredProducts" :key="product.id">
+              <div class="bg-white p-4 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow" @click="openModal(product.id)">
+                  <div class="aspect-w-1 aspect-h-1 mb-4">
+                      <img :src="product.image" :alt="product.title" class="object-cover w-full h-full rounded-t-lg">
+                  </div>
+                  <div class="flex flex-col">
+                      <h2 class="text-xl font-semibold mb-2" x-text="product.title"></h2>
+                      <p class="text-gray-700 mb-2" x-text="`Price: $${product.price}`"></p>
+                      <p class="text-gray-900 font-medium mb-2" x-text="`Category: ${product.category}`"></p>
+                      <p class="text-gray-600" x-text="`Rating: ${product.rating.rate} (${product.rating.count} reviews)`"></p>
+                  </div>
               </div>
-            </div>
-          </div>
-        </template>
+          </template>
+      </template>
+  </div>
+
+  <!-- Modal -->
+  <div x-show="selectedProduct" @click.self="closeModal()" class="modal" :class="{ 'modal-active': selectedProduct }">
+      <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full relative mx-auto my-6">
+          <button @click="closeModal()" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+          </button>
+
+          <template x-if="isModalLoading">
+              <div class="animate-pulse">
+                  <div class="h-32 w-32 bg-gray-200 rounded-md mb-4 mx-auto"></div>
+                  <div class="h-6 bg-gray-200 rounded mb-2"></div>
+                  <div class="h-4 bg-gray-200 rounded mb-2"></div>
+                  <div class="h-4 bg-gray-200 rounded mb-2"></div>
+                  <div class="h-4 bg-gray-200 rounded"></div>
+              </div>
+          </template>
+
+          <template x-if="!isModalLoading && selectedProduct">
+              <div class="flex items-center mb-4">
+                  <img :src="selectedProduct.image" :alt="selectedProduct.title" class="w-32 h-32 object-cover rounded-lg mr-4">
+                  <div>
+                      <h2 class="text-2xl font-semibold mb-2" x-text="selectedProduct.title"></h2>
+                      <p class="text-gray-700 mb-2" x-text="`Price: $${selectedProduct.price}`"></p>
+                      <p class="text-gray-900 font-medium mb-2" x-text="`Category: ${selectedProduct.category}`"></p>
+                      <p class="text-gray-600 mb-2" x-text="`Rating: ${selectedProduct.rating.rate} (${selectedProduct.rating.count} reviews)`"></p>
+                      <p class="text-gray-600 mt-2" x-text="selectedProduct.description"></p>
+                  </div>
+              </div>
+          </template>
       </div>
-    </div>
-  </body>
+  </div>
+</div>
+</main>
+</body>
 </html>
