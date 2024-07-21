@@ -123,6 +123,7 @@
         selectedCategory: '',
         searchTerm: '',
         sortOption: 'default',
+         selectedProduct: null,
         fetchProducts() {
             fetch('https://fakestoreapi.com/products') 
             .then(response => response.json())
@@ -159,7 +160,22 @@
           product.title.toLowerCase().includes(this.searchTerm.toLowerCase())
       );
   }
+
+    // Opens Modal by product click
+    openModal(productId) {
+      this.isModalLoading = true;
+      fetch(`https://fakestoreapi.com/products/${productId}`)
+          .then(response => response.json())
+          .then(data => {
+              this.selectedProduct = data;
+              this.isModalLoading = false;
+          });
+  },
+
+  closeModal() {
+    this.selectedProduct = null;
 }
+    }
 }"
       x-init="fetchProducts()"
     >
@@ -243,6 +259,41 @@
                     x-text="product.category"
                   ></p>
                 </div>
+
+               
+                  <!-- Modal -->
+            <div x-show="selectedProduct" @click.self="closeModal()" class="modal" :class="{ 'modal-active': selectedProduct }">
+              <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full relative mx-auto my-6">
+                  <button @click="closeModal()" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700">
+                      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                      </svg>
+                  </button>
+
+                  <template x-if="isModalLoading">
+                      <div class="animate-pulse">
+                          <div class="h-32 w-32 bg-gray-200 rounded-md mb-4 mx-auto"></div>
+                          <div class="h-6 bg-gray-200 rounded mb-2"></div>
+                          <div class="h-4 bg-gray-200 rounded mb-2"></div>
+                          <div class="h-4 bg-gray-200 rounded mb-2"></div>
+                          <div class="h-4 bg-gray-200 rounded"></div>
+                      </div>
+                  </template>
+
+                  <template x-if="!isModalLoading && selectedProduct">
+                      <div class="flex items-center mb-4">
+                          <img :src="selectedProduct.image" :alt="selectedProduct.title" class="w-32 h-32 object-cover rounded-lg mr-4">
+                          <div>
+                              <h2 class="text-2xl font-semibold mb-2" x-text="selectedProduct.title"></h2>
+                              <p class="text-gray-700 mb-2" x-text="`Price: $${selectedProduct.price}`"></p>
+                              <p class="text-gray-900 font-medium mb-2" x-text="`Category: ${selectedProduct.category}`"></p>
+                              <p class="text-gray-600 mb-2" x-text="`Rating: ${selectedProduct.rating.rate} (${selectedProduct.rating.count} reviews)`"></p>
+                              <p class="text-gray-600 mt-2" x-text="selectedProduct.description"></p>
+                          </div>
+                      </div>
+                  </template>
+
+
                 <div class="justify-end space-x-2">
                   <button @click="add-to-favourites">
                     <svg
