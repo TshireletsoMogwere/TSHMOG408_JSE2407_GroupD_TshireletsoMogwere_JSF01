@@ -143,15 +143,11 @@
     }
         
     // Apply sorting
-    sortProducts() {
-        if (this.sortOption === 'lowToHigh') {
-            this.filteredProducts = [...this.filteredProducts].sort((a, b) => a.price - b.price);
-        } else if (this.sortOption === 'highToLow') {
-            this.filteredProducts = [...this.filteredProducts].sort((a, b) => b.price - a.price);
-        } else {
-            this.filteredProducts = this.products;
-        }
-    }
+    if (this.sortOption === 'lowToHigh') {
+      tempProducts.sort((a, b) => a.price - b.price);
+  } else if (this.sortOption === 'highToLow') {
+      tempProducts.sort((a, b) => b.price - a.price);
+  }
 
 
     // Apply search term
@@ -160,6 +156,9 @@
           product.title.toLowerCase().includes(this.searchTerm.toLowerCase())
       );
   }
+
+  this.filteredProducts = tempProducts;
+},
 
     // Opens Modal by product click
     openModal(productId) {
@@ -175,22 +174,18 @@
   closeModal() {
     this.selectedProduct = null;
 }
-    }
-}"
+    }"
       x-init="fetchProducts()"
     >
       <!-- Sorts options -->
-      <div class="flex justify-end mb-4">
-        <select
-          x-model="sortOption"
-          @change="sortProducts()"
-          class="p-2 border rounded"
-        >
-          <option value="default">Default</option>
-          <option value="lowToHigh">Price: Low to High</option>
-          <option value="highToLow">Price: High to Low</option>
+      <div class="mb-6">
+        <label for="sort" class="block text-lg font-medium mb-2">Sort By:</label>
+        <select id="sort" x-model="sortOption" @change="updateFilteredProducts()" class="p-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="default">Default</option>
+            <option value="lowToHigh">Price: Low to High</option>
+            <option value="highToLow">Price: High to Low</option>
         </select>
-      </div>
+    </div>
 
       <!-- Filters by category -->
       <div class="mb-6">
