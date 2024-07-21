@@ -20,14 +20,18 @@
   <body class="bg-blue-200">
     <header class="sticky z-50 top-0">
       <nav class="bg-gray-500 border-gray-200">
-        <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+        <div
+          class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4"
+        >
           <button class="flex items-center space-x-3 rtl:space-x-reverse">
             <img
               src="./assets/online-shop.png"
               class="h-8"
               alt="Flowbite Logo"
             />
-            <span class="self-center text-2xl font-semibold whitespace-nowrap text-white">
+            <span
+              class="self-center text-2xl font-semibold whitespace-nowrap text-white"
+            >
               SwiftCart
             </span>
           </button>
@@ -64,13 +68,17 @@
               <ul
                 class="flex flex-col top-10 font-medium p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-500 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0"
               >
-                <li class="block py-2 px-3 text-white rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0">
+                <li
+                  class="block py-2 px-3 text-white rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0"
+                >
                   Wishlist
                 </li>
 
                 <li class="hidden lg:block md:block relative">
                   <div class="absolute left-3 -top-4">
-                    <p class="flex h-2 w-2 items-center justify-center rounded-full bg-red-500 p-3 text-xs text-white">
+                    <p
+                      class="flex h-2 w-2 items-center justify-center rounded-full bg-red-500 p-3 text-xs text-white"
+                    >
                       2
                     </p>
                   </div>
@@ -90,10 +98,14 @@
                   </svg>
                 </li>
 
-                <li class="lg:hidden md:hidden py-2 px-3 text-white rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0">
+                <li
+                  class="lg:hidden md:hidden py-2 px-3 text-white rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0"
+                >
                   Cart
                 </li>
-                <li class="block py-2 px-3 text-white rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0">
+                <li
+                  class="block py-2 px-3 text-white rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0"
+                >
                   Login
                 </li>
               </ul>
@@ -103,12 +115,13 @@
       </nav>
     </header>
 
-    <div 
+    <div
       x-data="{ 
         products: [], 
         filteredProducts: [],
         categories: [],
         selectedCategory: '',
+        searchTerm: '',
         sortOption: 'default',
         fetchProducts() {
             fetch('https://fakestoreapi.com/products') 
@@ -123,10 +136,12 @@
     updateFilteredProducts() {
       let tempProducts = this.products;
 
+      // Filter by category if selected
       if (this.selectedCategory) {
         tempProducts = tempProducts.filter(product => product.category === this.selectedCategory);
     }
         
+    // Apply sorting
     sortProducts() {
         if (this.sortOption === 'lowToHigh') {
             this.filteredProducts = [...this.filteredProducts].sort((a, b) => a.price - b.price);
@@ -135,20 +150,26 @@
         } else {
             this.filteredProducts = this.products;
         }
-    },
-
-    searchByCategory(category) {
-        this.category = category;
-        this.filteredProducts = this.products.filter(product => product.category.toLowerCase().includes(category.toLowerCase()));
     }
-  }
-}"
-  x-init="fetchProducts()"
->
 
-        <!-- Sorts options -->
+
+    // Apply search term
+      if (this.searchTerm) {
+      tempProducts = tempProducts.filter(product =>
+          product.title.toLowerCase().includes(this.searchTerm.toLowerCase())
+      );
+  }
+}
+}"
+      x-init="fetchProducts()"
+    >
+      <!-- Sorts options -->
       <div class="flex justify-end mb-4">
-        <select x-model="sortOption" @change="sortProducts()" class="p-2 border rounded">
+        <select
+          x-model="sortOption"
+          @change="sortProducts()"
+          class="p-2 border rounded"
+        >
           <option value="default">Default</option>
           <option value="lowToHigh">Price: Low to High</option>
           <option value="highToLow">Price: High to Low</option>
@@ -157,35 +178,70 @@
 
       <!-- Filters by category -->
       <div class="mb-6">
-        <label for="categoryDropdown" class="block text-lg font-medium mb-2">Filter by Category:</label>
-        <select id="categoryDropdown" x-model="selectedCategory" @change="updateFilteredProducts()" class="p-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <option value="">All Categories</option>
-            <template x-for="category in categories" :key="category">
-                <option :value="category" x-text="category"></option>
-            </template>
+        <label for="categoryDropdown" class="block text-lg font-medium mb-2"
+          >Filter by Category:</label
+        >
+        <select
+          id="categoryDropdown"
+          x-model="selectedCategory"
+          @change="updateFilteredProducts()"
+          class="p-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="">All Categories</option>
+          <template x-for="category in categories" :key="category">
+            <option :value="category" x-text="category"></option>
+          </template>
         </select>
-    </div>
+      </div>
+
+      <!-- Search by Product Name -->
+      <div class="mb-6">
+        <label for="productSearch" class="block text-lg font-medium mb-2"
+          >Search by Product Name:</label
+        >
+        <input
+          type="text"
+          id="productSearch"
+          x-model="searchTerm"
+          @input="updateFilteredProducts()"
+          class="p-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
+        />
+      </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
         <template x-for="product in filteredProducts" :key="product.id">
           <div class="border rounded-lg shadow-lg overflow-hidden bg-white">
-            <img :src="product.image" alt="Product Image" class="object-contain h-48 mt-3">
+            <img
+              :src="product.image"
+              alt="Product Image"
+              class="object-contain h-48 mt-3"
+            />
             <div class="flex-1 flex flex-col p-6">
               <div class="flex-1">
                 <header class="mb-2 flex-2">
-                  <div class="text-slate-600 focus-visible:outline-none focus-visible:ring focus-visible:ring-indigo-300">
-                    <p class="text-lg line-clamp-2 font-extrabold leading-snug" x-text="product.title"></p>
+                  <div
+                    class="text-slate-600 focus-visible:outline-none focus-visible:ring focus-visible:ring-indigo-300"
+                  >
+                    <p
+                      class="text-lg line-clamp-2 font-extrabold leading-snug"
+                      x-text="product.title"
+                    ></p>
                   </div>
                 </header>
 
-                <div class="text-base line-clamp-2 font-extrabold text-slate-500 leading-snug">
+                <div
+                  class="text-base line-clamp-2 font-extrabold text-slate-500 leading-snug"
+                >
                   <p x-text="`$${product.price}`"></p>
                 </div>
               </div>
 
               <div class="flex mt-1 space-x-2">
                 <div class="justify-start flex-1">
-                  <p class="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10" x-text="product.category"></p>
+                  <p
+                    class="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10"
+                    x-text="product.category"
+                  ></p>
                 </div>
                 <div class="justify-end space-x-2">
                   <button @click="add-to-favourites">
@@ -209,7 +265,9 @@
                     </svg>
                   </button>
 
-                  <button class="inline-flex justify-center whitespace-nowrap rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-cyan-900 focus-visible:outline-none focus-visible:ring focus-visible:ring-indigo-300 transition-colors">
+                  <button
+                    class="inline-flex justify-center whitespace-nowrap rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-cyan-900 focus-visible:outline-none focus-visible:ring focus-visible:ring-indigo-300 transition-colors"
+                  >
                     Add To Cart
                   </button>
                 </div>
@@ -221,4 +279,3 @@
     </div>
   </body>
 </html>
-               
