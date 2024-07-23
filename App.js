@@ -1,4 +1,4 @@
-export default function ecommerceStore() {
+function ecommerceStore() {
     return {
         products: [],
         filteredProducts: [],
@@ -53,6 +53,7 @@ export default function ecommerceStore() {
 
         openModal(productId) {
             this.isModalLoading = true;
+            
             fetch(`https://fakestoreapi.com/products/${productId}`)
                 .then(response => response.json())
                 .then(data => {
